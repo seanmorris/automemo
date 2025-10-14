@@ -96,6 +96,71 @@ function testFunctionArgMemoization() {
 	assert.strictEqual(count, 1, 'Function arguments should be memoized correctly');
 }
 
+function testTimestampBasedMemoization() {
+	let count = 0;
+	const compute = ({ id, timestamp }) => {
+		count += 1;
+		return id;
+	};
+	const state = { id: 42, timestamp: 1000 };
+	const memoDefault = automemo(compute);
+	assert.strictEqual(memoDefault(state), 42);
+	state.timestamp = 2000;
+	assert.strictEqual(memoDefault(state), 42);
+	assert.strictEqual(count, 1);
+
+	count = 0;
+	const tsSchema = Schema.nTuple(
+		Schema.record({ id: Schema.number(), timestamp: Schema.number() })
+	);
+	const memoTs = automemo(compute, tsSchema);
+	assert.strictEqual(memoTs(state), 42);
+	state.timestamp = 3000;
+	assert.strictEqual(memoTs(state), 42);
+	assert.strictEqual(count, 2);
+}
+
+function testBasicUsage() {
+	let count = 0;
+
+	const slowFunction = (x, y) => {
+		count++;
+		return x + y;
+	};
+
+	const memo = automemo(slowFunction);
+
+	assert.strictEqual(memo(1, 2), 3);
+	assert.strictEqual(memo(1, 2), 3);
+
+	assert.strictEqual(count, 1, 'Basic usage should compute once per unique args');
+}
+
+function testCustomArgSchema() {
+	let count = 0;
+
+	const fn = (num, opts) => {
+		count++;
+		return num + (opts.flag ? 1 : 0);
+	};
+
+	const argSchema = Schema.sTuple(
+		Schema.number(),
+		Schema.xRecord({ flag: Schema.boolean() })
+	);
+
+	const memo = automemo(fn, argSchema);
+
+	// Same num & flag yields one computation even if extra props differ
+	assert.strictEqual(memo(5, { flag: true, extra: 'a' }), 6);
+	assert.strictEqual(memo(5, { flag: true, extra: 'b' }), 6);
+	assert.strictEqual(count, 1, 'Custom schema should ignore extra object props');
+
+	// Different flag yields new computation
+	assert.strictEqual(memo(5, { flag: false }), 5);
+	assert.strictEqual(count, 2, 'Changing flag should trigger recompute');
+}
+
 (async function runTests() {
 	testPrimitiveMemoization();
 	testObjectResultMemoization();
@@ -103,5 +168,8 @@ function testFunctionArgMemoization() {
 	testMultipleArgsMemoization();
 	testSchemaValidation();
 	testFunctionArgMemoization();
+	testBasicUsage();
+	testCustomArgSchema();
+	testTimestampBasedMemoization();
 	console.log('All tests passed');
 })();

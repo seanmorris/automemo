@@ -44,8 +44,61 @@ You can customize the argument schema:
 import { automemo } from "automemo";
 import { Schema } from "libtuple-schema";
 
-const argSchema = Schema.nTuple(Schema.number(), Schema.object({ flag: Schema.boolean() }));
-const memoizedWithSchema = automemo((num, opts) => /* ... */, argSchema);
+const argSchema = Schema.nTuple(
+  Schema.number(),
+  Schema.object({ flag: Schema.boolean() })
+);
+const memoizedWithSchema = automemo(
+  (num, opts) => /* expensive computation */,
+  argSchema
+);
+```
+
+### Schema-based Key Customization
+
+By default, `automemo` uses `Schema.nTuple(Schema.value())` to key on raw argument values (for objects, by reference). Mutating properties of the same object will _not_ change the cache key:
+
+```js
+import { automemo } from "automemo";
+
+let runCount = 0;
+const compute = ({ id, timestamp }) => {
+  runCount++;
+  return id;
+};
+
+const state = { id: 42, timestamp: 1000 };
+const memoDefault = automemo(compute);
+
+memoDefault(state);         // runCount -> 1
+state.timestamp = 2000;
+memoDefault(state);         // runCount still 1 (same object reference)
+```
+
+To key on specific properties (e.g. include `timestamp` in the cache key), supply a custom schema that precisely selects and serializes fields:
+
+```js
+import { automemo } from "automemo";
+import { Schema } from "libtuple-schema";
+
+let runCount = 0;
+const compute = ({ id, timestamp }) => {
+  runCount++;
+  return id;
+};
+
+const state = { id: 42, timestamp: 1000 };
+const tsSchema = Schema.nTuple(
+  Schema.record({
+    id:        Schema.number(),
+    timestamp: Schema.number(),
+  })
+);
+const memoWithTs = automemo(compute, tsSchema);
+
+memoWithTs(state);          // runCount -> 1
+state.timestamp = 3000;
+memoWithTs(state);          // runCount -> 2 (timestamp changed)
 ```
 
 ## API

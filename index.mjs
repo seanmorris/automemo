@@ -1,8 +1,9 @@
 import s from "libtuple-schema";
+
 import { WeakerMap } from "weakermap";
-const memosA = new WeakMap;
-const memosB = new WeakerMap;
 export const automemo = (func, argSchema = s.nTuple(s.value())) => {
+	const memosA = new WeakMap;
+	const memosB = new WeakerMap;
 	return (...args) => {
 		const argTuple = argSchema(args);
 
