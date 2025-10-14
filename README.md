@@ -44,9 +44,9 @@ You can customize the argument schema:
 import { automemo } from "automemo";
 import { Schema } from "libtuple-schema";
 
-const argSchema = Schema.nTuple(
+const argSchema = Schema.sTuple(
   Schema.number(),
-  Schema.object({ flag: Schema.boolean() })
+  Schema.xRecord({ flag: Schema.boolean() })
 );
 const memoizedWithSchema = automemo(
   (num, opts) => /* expensive computation */,
@@ -88,8 +88,8 @@ const compute = ({ id, timestamp }) => {
 };
 
 const state = { id: 42, timestamp: 1000 };
-const tsSchema = Schema.nTuple(
-  Schema.record({
+const tsSchema = Schema.sTuple(
+  Schema.xRecord({
     id:        Schema.number(),
     timestamp: Schema.number(),
   })
@@ -100,6 +100,34 @@ memoWithTs(state);          // runCount -> 1
 state.timestamp = 3000;
 memoWithTs(state);          // runCount -> 2 (timestamp changed)
 ```
+
+### Cache Keys Schemas
+
+#### Schema.xTuple()
+
+Use this as the top-level schema for functions that have a fixed number of parameters.
+
+Each argument provided will be used as the schema for arg in the corresponding position the final tuple representing the args.
+
+#### Schema.nTuple()
+
+Use this as the top-level schema for functions that have a variable number of parameters that ALL share the same schema.
+
+The argument provided will be used as the schema for EACH arg in the final tuple representing the args.
+
+#### Schema.tuple()
+
+Use this as the top-level schema for functions that have a few fixed parameters, followed by a variable number of parameters.
+
+The variable parameters will simply be passed through the tuple. This will be fixed when libtuple-schema has improved support for variadic functions.
+
+#### Schema.value()
+
+Returns the provided value as-is. Use as the second-level schema for your args if you don't need to do any validation.
+
+#### Further Reading
+
+Schemas can become quite complex, and go beyond the scope of this document. For more information on writing schemas, see [libtuple-schema](https://www.npmjs.com/package/libtuple-schema).
 
 ## API
 

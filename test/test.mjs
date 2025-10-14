@@ -110,8 +110,8 @@ function testTimestampBasedMemoization() {
 	assert.strictEqual(count, 1);
 
 	count = 0;
-	const tsSchema = Schema.nTuple(
-		Schema.record({ id: Schema.number(), timestamp: Schema.number() })
+	const tsSchema = Schema.sTuple(
+		Schema.xRecord({ id: Schema.number(), timestamp: Schema.number() })
 	);
 	const memoTs = automemo(compute, tsSchema);
 	assert.strictEqual(memoTs(state), 42);
