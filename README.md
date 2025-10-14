@@ -126,19 +126,19 @@ memoWithTs(state);          // runCount -> 2 (timestamp changed)
 
 Use this as the top-level schema for functions that have a fixed number of parameters.
 
-Each argument provided will be used as the schema for arg in the corresponding position the final tuple representing the args.
+Each argument provided will be used as the schema for the value in the corresponding position.
 
 #### Schema.nTuple()
 
 Use this as the top-level schema for functions that have a variable number of parameters that ALL share the same schema.
 
-The argument provided will be used as the schema for EACH arg in the final tuple representing the args.
+The argument provided will be used as the schema for EACH value.
 
 #### Schema.tuple()
 
 Use this as the top-level schema for functions that have a few fixed parameters, followed by a variable number of parameters.
 
-The variable parameters will simply be passed through the tuple. This will be fixed when libtuple-schema has improved support for variadic functions.
+The variable parameters will simply be passed through into the tuple. This will be improved upon when libtuple-schema has improved support for variadic functions.
 
 #### Schema.value()
 
