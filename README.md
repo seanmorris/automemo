@@ -2,6 +2,8 @@
 
 Automatic memoization for any function.
 
+`automemo` offers arguably the _most efficient_ memoization approach available in JavaScript, combining a frictionless developer experience (DX) with an exceptionally small memory footprint. Its built-in argument canonicalization and GC-aware caching (via `WeakMap`/`WeakerMap`) eliminate boilerplate and prevent memory leaks, giving you both ease of use and optimal performance.
+
 ## Overview
 
 `automemo` provides automatic memoization for functions by canonicalizing argument lists into tuple keys using `libtuple-schema` and caching results with `WeakMap` for primitive results and `WeakerMap` for object/function results. This ensures memory-safe caches that allow garbage collection of unused entries.
