@@ -1,0 +1,16 @@
+{
+  "name": "automemo",
+  "version": "0.0.0",
+  "description": "Automatic memoization for any function.",
+  "main": "index.mjs",
+  "scripts": {
+    "test": "node --expose-gc test/test.mjs"
+  },
+  "author": "Sean Morris",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "libtuple": "^1.0.0",
+    "libtuple-schema": "^0.0.0",
+    "weakermap": "^0.0.11"
+  }
+}
